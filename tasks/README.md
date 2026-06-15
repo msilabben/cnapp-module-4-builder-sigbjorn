@@ -29,6 +29,27 @@ Si ifra til fasilitator hvis dere møter på problemer.
 5. Velg "publish" på høyre side, og manuelt sett igang workflowen. 
 6. Gå til organisasjonssiden "msilabben", og velg "packages" i menyen på toppen. Ser du de tilhørende imagene du publiserte?
 
+### Verifiser signatur
+1. Åpne et nytt codespace ved å gå til hjemmeområdet til ditt M4 repository, klikk på "Code", deretter "Create new codespace on main"
+2. Log in på GHCR med docker cli
+```bash
+gh auth token | docker login ghcr.io --username $(gh api user -q ".login") --password-stdin
+```
+3. Retrieve and verify the SBoM
+```bash
+cosign verify-attestation \
+  --certificate-identity "https://github.com/msilabben/<your repository name>/.github/workflows/push-main.yml@refs/heads/main" \
+  --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
+  --type spdxjson \
+  --output json ghcr.io/msilabben/cnapp-module-4-builder/trivy:0.71.1 2>/dev/null | jq > result.json
+```
+4. Take a minute to reflect. What are we seeing in result.json?
+5. Decode the payload and inspect the contents
+```bash
+jq -r '.payload' result.json | base64 -d > payload.json
+```
+6. What does the 'subject' and 'predicate' tell us in payload.json?
+
 ### Oppdate M2 pipelines med ny kilde
 1. Gå til msilabben og fork repoet som heter: cnapp-module-2-application
 2. Velg msilabben som miljø. 

@@ -1,4 +1,3 @@
-#
 # CI security tool images
 
 This repository builds wrapper images for GitHub CI/CD pipelines.
